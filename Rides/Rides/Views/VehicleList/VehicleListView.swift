@@ -26,7 +26,7 @@ struct VehicleListView: View {
                 }
                 .overlay(Group {
                     if viewModel.vehicles.isEmpty {
-                        emptyView()
+                        EmptyStateView(title: "No vehicles to show", description: "Please enter the number of vehicles you want to fetch and tap Get button")
                     }
                 })
                 .toolbar {
@@ -72,20 +72,11 @@ struct VehicleListView: View {
     }
     
     @ViewBuilder
-    func emptyView() -> some View {
-        VStack(alignment: .center) {
-            Label("Please enter the number of vehicles you want to fetch and tap Get button", systemImage: "car")
-                .padding()
-                .fontWeight(.regular)
-        }
-    }
-    
-    @ViewBuilder
     func getDetailView(with id: Int?) -> some View {
         if let vehicle =  viewModel.vehicles.first(where: { $0.id == id }) {
             VehicleDetailsView(model: vehicle)
         } else {
-            Text("Some emty message")
+            EmptyStateView(title: "No vehicles details to display", description: "Please select a vehicle to view its details here")
         }
     }
 }
