@@ -12,7 +12,7 @@ struct VehicleListView: View {
     @State var fetchCount: String = ""
     @State var currentSort = Vehicle.SortKeys.vin
     
-    @StateObject private var viewModel: VehicleListViewModel = VehicleListViewModel(client: RidesClient())
+    @StateObject private var viewModel: VehicleListViewModel = VehicleListViewModel(client: RidesClient(), coordinator: Coordinator())
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -21,6 +21,7 @@ struct VehicleListView: View {
                     ForEach(viewModel.vehicles) { vehicle in
                         VehicleCell(model: vehicle)
                             .onTapGesture {
+                                path.append(CoordinatorPath.vehicleDetails(vehicle))
                             }
                     }
                 }
@@ -53,6 +54,9 @@ struct VehicleListView: View {
                 }
             }
             .navigationTitle("Vehicles")
+            .navigationDestination(for: CoordinatorPath.self) { selection in
+                viewModel.coordinator.getNavigationView(type: selection, path: $path)
+            }
         }
     }
     
