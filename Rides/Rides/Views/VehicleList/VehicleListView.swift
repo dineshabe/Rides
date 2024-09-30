@@ -11,52 +11,50 @@ struct VehicleListView: View {
     @State private var path = NavigationPath()
     @State var fetchCount: String = ""
     @State var currentSort = Vehicle.SortKeys.vin
-    
-    @StateObject private var viewModel: VehicleListViewModel = VehicleListViewModel(client: RidesClient(), coordinator: Coordinator())
+    @State private var selectedVehicleId: Int?
+
+    @StateObject private var viewModel: VehicleListViewModel = VehicleListViewModel(client: RidesClient())
 
     var body: some View {
-        NavigationStack(path: $path) {
-            List {
-                Section(header: headerView()) {
-                    ForEach(viewModel.vehicles) { vehicle in
-                        VehicleCell(model: vehicle)
-                            .onTapGesture {
-                                path.append(CoordinatorPath.vehicleDetails(vehicle))
-                            }
+        NavigationSplitView {
+            VStack {
+                headerView()
+                    .padding([.leading, .trailing], 10)
+                
+                List(viewModel.vehicles, selection: $selectedVehicleId) { vehicle in
+                    VehicleCell(model: vehicle)
+                }
+                .overlay(Group {
+                    if viewModel.vehicles.isEmpty {
+                        emptyView()
                     }
-                }
-            }
-            .overlay(Group {
-                if viewModel.vehicles.isEmpty {
-                    emptyView()
-                }
-            })
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                            ForEach(Vehicle.SortKeys.allCases, id: \.self) { sortKey in
-                                Button{
-                                    currentSort = sortKey
-                                    viewModel.sortVehicles(by: sortKey)
-                                } label: {
-                                    if (sortKey == currentSort) {
-                                        Label(sortKey.rawValue, systemImage:"checkmark.circle.fill")
-                                    } else {
-                                        Text(sortKey.rawValue)
+                })
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Menu {
+                                ForEach(Vehicle.SortKeys.allCases, id: \.self) { sortKey in
+                                    Button{
+                                        currentSort = sortKey
+                                        viewModel.sortVehicles(by: sortKey)
+                                    } label: {
+                                        if (sortKey == currentSort) {
+                                            Label(sortKey.rawValue, systemImage:"checkmark.circle.fill")
+                                        } else {
+                                            Text(sortKey.rawValue)
+                                        }
                                     }
                                 }
-                            }
-                       } label: {
-                           Image(systemName: "list.bullet")
-                               .resizable()
-                               .aspectRatio(contentMode: .fit)
-                       }
+                           } label: {
+                               Image(systemName: "list.bullet")
+                                   .resizable()
+                                   .aspectRatio(contentMode: .fit)
+                           }
+                    }
                 }
+                .navigationTitle("Vehicles")
             }
-            .navigationTitle("Vehicles")
-            .navigationDestination(for: CoordinatorPath.self) { selection in
-                viewModel.coordinator.getNavigationView(type: selection, path: $path)
-            }
+        } detail: {
+            getDetailView(with: selectedVehicleId)
         }
     }
     
@@ -76,9 +74,18 @@ struct VehicleListView: View {
     @ViewBuilder
     func emptyView() -> some View {
         VStack(alignment: .center) {
-            Text("Please enter the number of vehicles you want to fetch and tap Get button")
+            Label("Please enter the number of vehicles you want to fetch and tap Get button", systemImage: "car")
                 .padding()
                 .fontWeight(.regular)
+        }
+    }
+    
+    @ViewBuilder
+    func getDetailView(with id: Int?) -> some View {
+        if let vehicle =  viewModel.vehicles.first(where: { $0.id == id }) {
+            VehicleDetailsView(model: vehicle)
+        } else {
+            Text("Some emty message")
         }
     }
 }

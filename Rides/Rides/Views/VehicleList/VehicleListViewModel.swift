@@ -10,12 +10,10 @@ import SwiftUI
 
 class VehicleListViewModel: ObservableObject {
     let client: RidesClient
-    let coordinator: Coordinator
     @Published var vehicles: [Vehicle] = []
 
-    init(client: RidesClient, coordinator: Coordinator) {
+    init(client: RidesClient) {
         self.client = client
-        self.coordinator = coordinator
     }
 
     func fetchVehicles(_ fetchCount: String) {
