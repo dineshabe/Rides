@@ -11,18 +11,24 @@ import SwiftUI
 class VehicleListViewModel: ObservableObject {
     let client: RidesClient
     @Published var vehicles: [Vehicle] = []
-
+    @Published var fetchCount: String = ""
+    @Published var currentSort = Vehicle.SortKeys.vin
+    @Published var selectedVehicleId: Int?
+    
     init(client: RidesClient) {
         self.client = client
     }
 
-    func fetchVehicles(_ fetchCount: String) {
+    func fetchVehicles() {
         if let count = Int(fetchCount) {
             self.fetchVehicles(count: count)
+        } else {
+            //Display Error
         }
     }
     
     func sortVehicles(by key: Vehicle.SortKeys = .vin) {
+        currentSort = key
         self.vehicles = self.performSort(key: key, items: self.vehicles)
     }
     

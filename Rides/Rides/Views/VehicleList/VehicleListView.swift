@@ -8,11 +8,6 @@
 import SwiftUI
 
 struct VehicleListView: View {
-    @State private var path = NavigationPath()
-    @State var fetchCount: String = ""
-    @State var currentSort = Vehicle.SortKeys.vin
-    @State private var selectedVehicleId: Int?
-
     @StateObject private var viewModel: VehicleListViewModel = VehicleListViewModel(client: RidesClient())
 
     var body: some View {
@@ -21,7 +16,7 @@ struct VehicleListView: View {
                 headerView()
                     .padding([.leading, .trailing], 10)
                 
-                List(viewModel.vehicles, selection: $selectedVehicleId) { vehicle in
+                List(viewModel.vehicles, selection: $viewModel.selectedVehicleId) { vehicle in
                     VehicleCell(model: vehicle)
                 }
                 .overlay(Group {
@@ -34,10 +29,9 @@ struct VehicleListView: View {
                         Menu {
                                 ForEach(Vehicle.SortKeys.allCases, id: \.self) { sortKey in
                                     Button{
-                                        currentSort = sortKey
                                         viewModel.sortVehicles(by: sortKey)
                                     } label: {
-                                        if (sortKey == currentSort) {
+                                        if (sortKey == viewModel.currentSort) {
                                             Label(sortKey.rawValue, systemImage:"checkmark.circle.fill")
                                         } else {
                                             Text(sortKey.rawValue)
@@ -54,18 +48,18 @@ struct VehicleListView: View {
                 .navigationTitle("Vehicles")
             }
         } detail: {
-            getDetailView(with: selectedVehicleId)
+            getDetailView(with: viewModel.selectedVehicleId)
         }
     }
     
     @ViewBuilder
     func headerView() -> some View {
         HStack {
-            TextField("Enter the count of vehicles to fetch", text: $fetchCount)
+            TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
                 .textFieldStyle(.roundedBorder)
             
             Button("Get") {
-                viewModel.fetchVehicles(fetchCount)
+                viewModel.fetchVehicles()
             }
             .buttonStyle(.bordered)
         }
