@@ -31,6 +31,39 @@ struct Vehicle: Codable, Identifiable {
         case kilometrage = "Kilometrage"
         case licensePlate = "License Plate"
     }
+    
+    struct EmissionsSlab {
+        let upperLimit: Double?
+        let rate: Double
+    }
+    
+    static let emissionSlabs = [
+        EmissionsSlab(upperLimit: 5000, rate: 1),  // x1 for kilometrage up to 5,000
+        EmissionsSlab(upperLimit: nil, rate: 1.5)  // x1.5 for kilometrage above 5,000
+    ]
+}
+
+extension Vehicle {
+
+    func getEmissions() -> String {
+        var remainingKilometrage: Double = Double(kilometrage)
+        var total = 0.0
+
+        for slab in Vehicle.emissionSlabs {
+            if let limit = slab.upperLimit {
+                let emission = min(remainingKilometrage, limit)
+                total += emission * slab.rate
+                remainingKilometrage -= emission
+                if remainingKilometrage <= 0 {
+                    break
+                }
+            } else {
+                total += remainingKilometrage * slab.rate
+                break
+            }
+        }
+        return String(format: "%.2f", total)
+    }
 }
 
 extension Array where Element == Vehicle {

@@ -11,6 +11,21 @@ struct VehicleDetailsView: View {
     let model: Vehicle
     
     var body: some View {
+        TabView {
+            detailsView()
+            emissionsView()
+        }
+        .tabViewStyle(.page)
+        .tabViewStyle(.page(indexDisplayMode: .always))
+        .navigationTitle(model.makeAndModel.isEmpty ? "Vehicle Detail" : model.makeAndModel)
+        .onAppear() {
+            UIPageControl.appearance().currentPageIndicatorTintColor = .black
+            UIPageControl.appearance().pageIndicatorTintColor = .gray
+        }
+    }
+    
+    @ViewBuilder
+    func detailsView() -> some View {
         VStack(alignment: .leading) {
             GroupBox {
                 CaptionTextView(caption: "vin", text: model.vin)
@@ -26,6 +41,35 @@ struct VehicleDetailsView: View {
             
             Spacer()
         }
-        .navigationTitle(model.makeAndModel.isEmpty ? "Vehicle Detail" : model.makeAndModel)
+    }
+    
+    @ViewBuilder
+    func emissionsView() -> some View {
+        VStack(alignment: .leading) {
+            GroupBox(label: Label("Total Emissions", systemImage: "smoke")) {
+                
+                HStack {
+                    Text(model.getEmissions())
+                        .padding(.leading)
+                    Spacer()
+                }
+                
+                GroupBox(label: Label("Emissions calculation", systemImage: "questionmark.circle")) {
+                    VStack(alignment: .leading) {
+                        ForEach(Vehicle.emissionSlabs, id:\.self.rate) { slab in
+                            if let upperLimit = slab.upperLimit {
+                                Text("Emission rate of \(String(slab.rate)) till \(String(upperLimit))")
+                            } else {
+                                Text("Emission rate of \(String(slab.rate)) for the rest")
+                            }
+                        }
+                    }
+                    .fontWeight(.light)
+                }
+            }
+            .padding()
+            
+            Spacer()
+        }
     }
 }
