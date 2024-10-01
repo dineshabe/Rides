@@ -54,14 +54,22 @@ struct VehicleListView: View {
     @ViewBuilder
     func headerView() -> some View {
         GroupBox {
-            HStack {
-                TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
-                    .textFieldStyle(.roundedBorder)
-                
-                Button("Get") {
-                    viewModel.fetchVehicles()
+            VStack {
+                HStack {
+                    TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
+                        .textFieldStyle(.roundedBorder)
+                    
+                    Button("Get") {
+                        viewModel.fetchVehicles()
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
+                
+                if viewModel.displayError {
+                    Text(viewModel.errorMessage)
+                        .foregroundColor(.red)
+                        .fontWeight(.light)
+                }
             }
         }
     }

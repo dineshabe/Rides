@@ -10,21 +10,26 @@ import SwiftUI
 
 class VehicleListViewModel: ObservableObject {
     let client: RidesClient
+    let errorMessage = "Please enter a value between 1 and 100"
+    
     @Published var vehicles: [Vehicle] = []
     @Published var fetchCount: String = ""
     //Default sort by vin
     @Published var currentSort = Vehicle.SortKeys.vin
     @Published var selectedVehicleId: Int?
-    
+    @Published var displayError: Bool = false
+
     init(client: RidesClient) {
         self.client = client
     }
 
     func fetchVehicles() {
-        if let count = Int(fetchCount) {
+        displayError = false
+        if let count = Int(fetchCount), count > 0 && count < 100 {
             self.fetchVehicles(count: count)
         } else {
             //Display Error
+            displayError = true
         }
     }
     
