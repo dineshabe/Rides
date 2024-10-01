@@ -12,6 +12,7 @@ class VehicleListViewModel: ObservableObject {
     let client: RidesClient
     @Published var vehicles: [Vehicle] = []
     @Published var fetchCount: String = ""
+    //Default sort by vin
     @Published var currentSort = Vehicle.SortKeys.vin
     @Published var selectedVehicleId: Int?
     
@@ -27,7 +28,7 @@ class VehicleListViewModel: ObservableObject {
         }
     }
     
-    func sortVehicles(by key: Vehicle.SortKeys = .vin) {
+    func sortVehicles(by key: Vehicle.SortKeys) {
         currentSort = key
         self.vehicles = self.performSort(key: key, items: self.vehicles)
     }
@@ -36,21 +37,15 @@ class VehicleListViewModel: ObservableObject {
         Task {
             let result = try? await client.fetchVehicles(count: count)
             await MainActor.run {
-                self.vehicles = (result ?? []).sorted { $0.vin < $1.vin }
+                vehicles = performSort(key: currentSort, items: result)
             }
         }
     }
     
-    private func performSort(key: Vehicle.SortKeys, items: [Vehicle]) -> [Vehicle] {
-        switch(key) {
-        case .kilometrage:
-            items.sorted { $0.kilometrage < $1.kilometrage }
-        case .licensePlate:
-            items.sorted { $0.licensePlate < $1.licensePlate }
-        case .mileage:
-            items.sorted { $0.mileage < $1.mileage }
-        case .vin:
-            items.sorted { $0.vin < $1.vin }
+    private func performSort(key: Vehicle.SortKeys, items: [Vehicle]?) -> [Vehicle] {
+        guard let items = items else {
+            return []
         }
+        return items.sort(key: key)
     }
 }

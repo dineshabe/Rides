@@ -32,3 +32,18 @@ struct Vehicle: Codable, Identifiable {
         case licensePlate = "License Plate"
     }
 }
+
+extension Array where Element == Vehicle {
+    func sort(key: Vehicle.SortKeys) -> [Vehicle] {
+        switch(key) {
+        case .kilometrage:
+            return self.sorted { $0.kilometrage < $1.kilometrage }
+        case .licensePlate:
+            return self.sorted { $0.licensePlate < $1.licensePlate }
+        case .mileage:
+            return self.sorted { $0.mileage < $1.mileage }
+        case .vin:
+            return self.sorted { $0.vin < $1.vin }
+        }
+    }
+}

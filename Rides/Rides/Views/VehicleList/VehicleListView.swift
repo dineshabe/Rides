@@ -12,9 +12,8 @@ struct VehicleListView: View {
 
     var body: some View {
         NavigationSplitView {
-            VStack {
+            VStack(alignment: .leading, spacing: 0) {
                 headerView()
-                    .padding([.leading, .trailing], 10)
                 
                 List(viewModel.vehicles, selection: $viewModel.selectedVehicleId) { vehicle in
                     VehicleCell(model: vehicle)
@@ -54,14 +53,16 @@ struct VehicleListView: View {
     
     @ViewBuilder
     func headerView() -> some View {
-        HStack {
-            TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
-                .textFieldStyle(.roundedBorder)
-            
-            Button("Get") {
-                viewModel.fetchVehicles()
+        GroupBox {
+            HStack {
+                TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
+                    .textFieldStyle(.roundedBorder)
+                
+                Button("Get") {
+                    viewModel.fetchVehicles()
+                }
+                .buttonStyle(.bordered)
             }
-            .buttonStyle(.bordered)
         }
     }
     
