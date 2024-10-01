@@ -45,7 +45,7 @@ struct Vehicle: Codable, Identifiable {
 
 extension Vehicle {
 
-    func getEmissions() -> String {
+    func getEmissions() -> Double {
         var remainingKilometrage: Double = Double(kilometrage)
         var total = 0.0
 
@@ -62,7 +62,7 @@ extension Vehicle {
                 break
             }
         }
-        return String(format: "%.2f", total)
+        return total
     }
 }
 

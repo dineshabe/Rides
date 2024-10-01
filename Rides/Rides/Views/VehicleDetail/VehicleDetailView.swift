@@ -48,23 +48,25 @@ struct VehicleDetailsView: View {
         VStack(alignment: .leading) {
             GroupBox(label: Label("Total Emissions", systemImage: "smoke")) {
                 
-                HStack {
-                    Text(model.getEmissions())
-                        .padding(.leading)
-                    Spacer()
-                }
+                Text(model.getEmissions().pretty)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 5)
+
                 
                 GroupBox(label: Label("Emissions calculation", systemImage: "questionmark.circle")) {
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 5) {
                         ForEach(Vehicle.emissionSlabs, id:\.self.rate) { slab in
                             if let upperLimit = slab.upperLimit {
-                                Text("Emission rate of \(String(slab.rate)) till \(String(upperLimit))")
+                                Text("Emission rate of \(slab.rate.pretty)x till \(upperLimit.pretty)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             } else {
-                                Text("Emission rate of \(String(slab.rate)) for the rest")
+                                Text("Emission rate of \(slab.rate.pretty)x for the rest")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
                     }
                     .fontWeight(.light)
+                    .padding(.top, 5)
                 }
             }
             .padding()
