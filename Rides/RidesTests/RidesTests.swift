@@ -10,8 +10,45 @@ import Testing
 
 struct RidesTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    @Test func fetch_validation_wrongtype() async throws {
+        let vm = VehicleListViewModel(client: RidesClient())
+        vm.fetchCount = "test"
+        vm.fetchVehicles()
+        #expect(vm.displayError == true)
     }
-
+    
+    @Test func fetch_validation_negative() async throws {
+        let vm = VehicleListViewModel(client: RidesClient())
+        vm.fetchCount = "-45"
+        vm.fetchVehicles()
+        #expect(vm.displayError == true)
+    }
+    
+    @Test func fetch_validation_zero() async throws {
+        let vm = VehicleListViewModel(client: RidesClient())
+        vm.fetchCount = "0"
+        vm.fetchVehicles()
+        #expect(vm.displayError == true)
+    }
+    
+    @Test func fetch_validation_largenumber() async throws {
+        let vm = VehicleListViewModel(client: RidesClient())
+        vm.fetchCount = "145"
+        vm.fetchVehicles()
+        #expect(vm.displayError == true)
+    }
+    
+    @Test func fetch_validation_valid_100() async throws {
+        let vm = VehicleListViewModel(client: RidesClient())
+        vm.fetchCount = "100"
+        vm.fetchVehicles()
+        #expect(vm.displayError == false)
+    }
+    
+    @Test func fetch_validation_valid_1() async throws {
+        let vm = VehicleListViewModel(client: RidesClient())
+        vm.fetchCount = "1"
+        vm.fetchVehicles()
+        #expect(vm.displayError == false)
+    }
 }

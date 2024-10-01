@@ -23,12 +23,12 @@ class VehicleListViewModel: ObservableObject {
         self.client = client
     }
 
+    //MARK: View facing functions
     func fetchVehicles() {
         displayError = false
-        if let count = Int(fetchCount), count > 0 && count < 100 {
+        if let count = Int(fetchCount), count > 0 && count <= 100 {
             self.fetchVehicles(count: count)
         } else {
-            //Display Error
             displayError = true
         }
     }
@@ -38,6 +38,7 @@ class VehicleListViewModel: ObservableObject {
         self.vehicles = self.performSort(key: key, items: self.vehicles)
     }
     
+    //MARK: Private functions
     private func fetchVehicles(count: Int) {
         Task {
             let result = try? await client.fetchVehicles(count: count)
