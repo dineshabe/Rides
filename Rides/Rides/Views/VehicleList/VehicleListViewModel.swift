@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 class VehicleListViewModel: ObservableObject {
-    let client: RidesClient
+    let client: RideClientProtocol
     let errorMessage = "Please enter a value between 1 and 100"
     
     @Published var vehicles: [Vehicle] = []
@@ -19,33 +19,33 @@ class VehicleListViewModel: ObservableObject {
     @Published var selectedVehicleId: Int?
     @Published var displayError: Bool = false
 
-    init(client: RidesClient) {
+    init(client: RideClientProtocol) {
         self.client = client
     }
 
     //MARK: View facing functions
-    func fetchVehicles() {
-        displayError = false
+    func fetchVehicles() async {
+        //Clear old errors
+        await MainActor.run {
+            displayError = false
+        }
         if let count = Int(fetchCount), count > 0 && count <= 100 {
-            self.fetchVehicles(count: count)
+            //Validation OK
+            let result = try? await client.fetchVehicles(count: count)
+            await MainActor.run {
+                vehicles = performSort(key: currentSort, items: result)
+            }
         } else {
-            displayError = true
+            //Invalid input by the user
+            await MainActor.run {
+                displayError = true
+            }
         }
     }
     
     func sortVehicles(by key: Vehicle.SortKeys) {
         currentSort = key
         self.vehicles = self.performSort(key: key, items: self.vehicles)
-    }
-    
-    //MARK: Private functions
-    private func fetchVehicles(count: Int) {
-        Task {
-            let result = try? await client.fetchVehicles(count: count)
-            await MainActor.run {
-                vehicles = performSort(key: currentSort, items: result)
-            }
-        }
     }
     
     private func performSort(key: Vehicle.SortKeys, items: [Vehicle]?) -> [Vehicle] {

@@ -60,7 +60,9 @@ struct VehicleListView: View {
                         .textFieldStyle(.roundedBorder)
                     
                     Button("Get") {
-                        viewModel.fetchVehicles()
+                        Task {
+                            await viewModel.fetchVehicles()
+                        }
                     }
                     .buttonStyle(.bordered)
                 }

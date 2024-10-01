@@ -8,20 +8,11 @@
 import Foundation
 
 protocol NetworkClient {
+    var session: URLSession { get }
     func fetch<T: Codable>(type: T.Type, with request: URLRequest) async throws -> T
 }
 
-class BaseClient: NetworkClient {
-    var session: URLSession
-    
-    init(configuration: URLSessionConfiguration) {
-        self.session = URLSession(configuration: configuration)
-    }
-    
-    convenience init() {
-        self.init(configuration: .default)
-    }
-    
+extension NetworkClient {
     func fetch<T: Codable>(type: T.Type, with request: URLRequest) async throws -> T {
         let (data, response) = try await session.data(for: request)
         
