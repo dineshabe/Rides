@@ -20,7 +20,7 @@ struct VehicleListView: View {
                 }
                 .overlay(Group {
                     if viewModel.vehicles.isEmpty {
-                        EmptyStateView(title: "No vehicles to show", description: "Please enter the number of vehicles you want to fetch and tap Get button")
+                        EmptyStateView(title: "No vehicles", description: "Please enter the number of vehicles you want to fetch and tap Get button")
                     }
                 })
                 .toolbar {
