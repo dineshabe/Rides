@@ -8,11 +8,20 @@
 import Foundation
 
 protocol NetworkClient {
-    var session: URLSession { get }
     func fetch<T: Codable>(type: T.Type, with request: URLRequest) async throws -> T
 }
 
-extension NetworkClient {
+class BaseClient: NetworkClient {
+    var session: URLSession
+    
+    init(configuration: URLSessionConfiguration) {
+        self.session = URLSession(configuration: configuration)
+    }
+    
+    convenience init() {
+        self.init(configuration: .default)
+    }
+    
     func fetch<T: Codable>(type: T.Type, with request: URLRequest) async throws -> T {
         let (data, response) = try await session.data(for: request)
         
@@ -36,18 +45,6 @@ extension NetworkClient {
     }
 }
 
-class BaseClient: NetworkClient {
-    var session: URLSession
-    
-    init(configuration: URLSessionConfiguration) {
-        self.session = URLSession(configuration: configuration)
-    }
-    
-    convenience init() {
-        self.init(configuration: .default)
-    }
-}
-
 enum ApiUrl {
     case getVehicles(count: Int)
     
@@ -65,22 +62,14 @@ enum ApiUrl {
 
 enum ApiError: Error {
  case requestFailed(description: String)
- case invalidData
  case responseUnsuccessful(description: String, code: Int)
  case jsonConversionFailure(description: String)
- case jsonParsingFailure
- case failedSerialization
- case noInternet
 
     var customDescription: String {
         switch self {
            case let .requestFailed(description): return "Request Failed: \(description)"
-           case .invalidData: return "Invalid Data)"
            case let .responseUnsuccessful(description, _): return "Unsuccessful: \(description)"
            case let .jsonConversionFailure(description): return "JSON Conversion Failure: \(description)"
-           case .jsonParsingFailure: return "JSON Parsing Failure"
-           case .failedSerialization: return "Serialization failed."
-           case .noInternet: return "No internet connection"
         }
     }
 }
