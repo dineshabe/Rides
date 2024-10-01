@@ -52,7 +52,6 @@ struct VehicleDetailsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 5)
 
-                
                 GroupBox(label: Label("Emissions calculation", systemImage: "questionmark.circle")) {
                     VStack(alignment: .leading, spacing: 5) {
                         ForEach(Vehicle.emissionSlabs, id:\.self.rate) { slab in

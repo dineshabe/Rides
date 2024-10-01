@@ -16,7 +16,6 @@ final class RidesClient: BaseClient {
             let result = try await self.fetch(type: [Vehicle].self, with: request as URLRequest)
             return result
         } catch let err {
-            //rethrow for now
             throw err
         }
     }

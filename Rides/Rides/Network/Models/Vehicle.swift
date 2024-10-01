@@ -44,8 +44,11 @@ struct Vehicle: Codable, Identifiable {
 }
 
 extension Vehicle {
-
     func getEmissions() -> Double {
+        //Assumption : Emissions cannot be negative
+        guard kilometrage > 0 else {
+            return 0
+        }
         var remainingKilometrage: Double = Double(kilometrage)
         var total = 0.0
 
