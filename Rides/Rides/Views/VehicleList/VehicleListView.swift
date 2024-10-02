@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct VehicleListView: View {
-    @StateObject private var viewModel: VehicleListViewModel = VehicleListViewModel(client: RidesClient())
+    @StateObject var viewModel: VehicleListViewModel
 
     var body: some View {
         NavigationSplitView {
             VStack(alignment: .leading, spacing: 0) {
-                headerView()
-                
-                List(viewModel.vehicles, selection: $viewModel.selectedVehicleId) { vehicle in
-                    VehicleCell(model: vehicle)
+                List(selection: $viewModel.selectedVehicleId) {
+                    Section(header: headerView()) {
+                        ForEach(viewModel.vehicles) { vehicle in
+                            VehicleCell(model: vehicle)
+                        }
+                    }
                 }
                 .overlay(Group {
                     if viewModel.vehicles.isEmpty {
@@ -58,33 +60,32 @@ struct VehicleListView: View {
     
     @ViewBuilder
     func headerView() -> some View {
-        GroupBox {
-            VStack {
-                HStack {
-                    TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
-                        .keyboardType(.numberPad)
-                        .onChange(of: viewModel.fetchCount) { _ in
-                            viewModel.validate()
-                        }
-                        .textFieldStyle(.roundedBorder)
-                    
-                    Button("Get") {
-                        Task {
-                            await viewModel.fetchVehicles()
-                        }
+        VStack {
+            HStack {
+                TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
+                    .keyboardType(.numberPad)
+                    .onChange(of: viewModel.fetchCount) { _ in
+                        viewModel.validate()
                     }
-                    .buttonStyle(.bordered)
-                    .disabled(!viewModel.canFetch)
-                }
+                    .textFieldStyle(.roundedBorder)
                 
-                if viewModel.showError {
-                    Text(viewModel.errorMessage)
-                        .fontWeight(.light)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 5)
+                Button("Get") {
+                    Task {
+                        await viewModel.fetchVehicles()
+                    }
                 }
+                .buttonStyle(.bordered)
+                .disabled(!viewModel.canFetch)
+            }
+            
+            if viewModel.showError {
+                Text(viewModel.errorMessage)
+                    .fontWeight(.light)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 5)
             }
         }
+        .textCase(.none)
     }
     
     @ViewBuilder
@@ -97,6 +98,6 @@ struct VehicleListView: View {
     }
 }
 
-#Preview {
+/*#Preview {
     VehicleListView()
-}
+}*/
