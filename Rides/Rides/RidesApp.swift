@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct RidesApp: App {
+    let ridesDependencyContainer = RidesDependencyContainer()
+    
     var body: some Scene {
         WindowGroup {
-            VehicleListView()
+            VehicleListView(viewModel: VehicleListViewModel(client: ridesDependencyContainer.rideClient))
         }
     }
 }
