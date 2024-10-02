@@ -27,16 +27,6 @@ final class RidesUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
         XCTAssertEqual(app.buttons["Get"].isEnabled, false)
-
-        
-        /*app.textFields["Enter the count of vehicles to fetch"].tap()
-        
-
-        pleaseEnterAValueBetween1And100StaticText.tap()
-        pleaseEnterAValueBetween1And100StaticText.tap()*/
-
-        
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
     @MainActor
@@ -65,12 +55,22 @@ final class RidesUITests: XCTestCase {
     }
     
     @MainActor
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
-        }
+    func testValidFetch() throws {
+        let app = XCUIApplication()
+        app.launch()
+        
+        let textField = app.textFields["Enter the count of vehicles to fetch"]
+        textField.tap()
+        textField.typeText("10")
+
+        XCTAssertEqual(app.buttons["Get"].isEnabled, true)
+        app.buttons["Get"].tap()
+        
+        let sidebarCollectionView = app.collectionViews["Sidebar"]
+        let predicate = NSPredicate(format: "cells.count == 10")
+        expectation(for: predicate, evaluatedWith: sidebarCollectionView)
+        waitForExpectations(timeout: 5)
+        
+        XCTAssertEqual(sidebarCollectionView.cells.count, 10)
     }
 }

@@ -64,7 +64,6 @@ class VehicleListViewModel: ObservableObject {
     
     @MainActor
     private func startLoading() {
-        //Reset error when we start loading
         isLoading = true
     }
     
