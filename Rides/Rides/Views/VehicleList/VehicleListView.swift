@@ -45,7 +45,7 @@ struct VehicleListView: View {
                                     }
                                 }
                            } label: {
-                               Image(systemName: "list.bullet")
+                               Image(systemName: "arrow.up.arrow.down")
                                    .resizable()
                                    .aspectRatio(contentMode: .fit)
                            }
