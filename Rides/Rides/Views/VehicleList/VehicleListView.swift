@@ -22,6 +22,11 @@ struct VehicleListView: View {
                     if viewModel.vehicles.isEmpty {
                         EmptyStateView(title: "No vehicles", description: "Please enter the number of vehicles you want to fetch and tap Get button")
                     }
+                    
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    }
                 })
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -57,6 +62,10 @@ struct VehicleListView: View {
             VStack {
                 HStack {
                     TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
+                        .keyboardType(.numberPad)
+                        .onChange(of: viewModel.fetchCount) { _ in
+                            viewModel.validate()
+                        }
                         .textFieldStyle(.roundedBorder)
                     
                     Button("Get") {
@@ -65,12 +74,14 @@ struct VehicleListView: View {
                         }
                     }
                     .buttonStyle(.bordered)
+                    .disabled(!viewModel.canFetch)
                 }
                 
-                if viewModel.displayError {
+                if viewModel.showError {
                     Text(viewModel.errorMessage)
-                        .foregroundColor(.red)
                         .fontWeight(.light)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 5)
                 }
             }
         }

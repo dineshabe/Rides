@@ -23,14 +23,47 @@ final class RidesUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testGetDisabled() throws {
         let app = XCUIApplication()
         app.launch()
+        XCTAssertEqual(app.buttons["Get"].isEnabled, false)
 
+        
+        /*app.textFields["Enter the count of vehicles to fetch"].tap()
+        
+
+        pleaseEnterAValueBetween1And100StaticText.tap()
+        pleaseEnterAValueBetween1And100StaticText.tap()*/
+
+        
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
-
+    
+    @MainActor
+    func testGetEnabled() throws {
+        let app = XCUIApplication()
+        app.launch()
+        
+        let textField = app.textFields["Enter the count of vehicles to fetch"]
+        textField.tap()
+        textField.typeText("1")
+        XCTAssertEqual(app.buttons["Get"].isEnabled, true)
+    }
+    
+    @MainActor
+    func testValidationError() throws {
+        let app = XCUIApplication()
+        app.launch()
+        
+        let textField = app.textFields["Enter the count of vehicles to fetch"]
+        textField.tap()
+        textField.typeText("101")
+        XCTAssertEqual(app.buttons["Get"].isEnabled, false)
+        
+        let validationErrorText = app.staticTexts["Please enter a value between 1 and 100"]
+        XCTAssertEqual(validationErrorText.exists, true)
+    }
+    
     @MainActor
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {

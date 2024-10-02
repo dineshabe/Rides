@@ -17,35 +17,61 @@ class VehicleListViewModel: ObservableObject {
     //Default sort by vin
     @Published var currentSort = Vehicle.SortKeys.vin
     @Published var selectedVehicleId: Int?
-    @Published var displayError: Bool = false
-
+    
+    @Published var canFetch: Bool = false
+    @Published var showError: Bool = false
+    @Published var isLoading: Bool = false
+    
     init(client: RideClientProtocol) {
         self.client = client
     }
 
     //MARK: View facing functions
-    func fetchVehicles() async {
-        //Clear old errors
-        await MainActor.run {
-            displayError = false
-        }
-        if let count = Int(fetchCount), count > 0 && count <= 100 {
-            //Validation OK
-            let result = try? await client.fetchVehicles(count: count)
-            await MainActor.run {
-                vehicles = performSort(key: currentSort, items: result)
+    func validate() {
+        if fetchCount.count > 0 {
+            if let count = Int(fetchCount), count > 0 && count <= 100 {
+                showError = false
+                canFetch = true
+            } else {
+                showError = true
+                canFetch = false
             }
         } else {
-            //Invalid input by the user
-            await MainActor.run {
-                displayError = true
-            }
+            showError = false
+            canFetch = false
+        }
+    }
+    
+    func fetchVehicles() async {
+        await startLoading()
+        if canFetch {
+            let result = try? await client.fetchVehicles(count: count)
+            await finishLoading(result: result)
+        } else {
+            await finishLoading()
         }
     }
     
     func sortVehicles(by key: Vehicle.SortKeys) {
         currentSort = key
         self.vehicles = self.performSort(key: key, items: self.vehicles)
+    }
+    
+    //MARK: Private functions
+    private var count: Int {
+        return Int(fetchCount) ?? 0
+    }
+    
+    @MainActor
+    private func startLoading() {
+        //Reset error when we start loading
+        isLoading = true
+    }
+    
+    @MainActor
+    private func finishLoading(result: [Vehicle]? = nil) {
+        vehicles = performSort(key: currentSort, items: result)
+        isLoading = false
     }
     
     private func performSort(key: Vehicle.SortKeys, items: [Vehicle]?) -> [Vehicle] {
