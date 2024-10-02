@@ -10,17 +10,30 @@ import SwiftUI
 struct VehicleDetailsView: View {
     let model: Vehicle
     
+    @State private var currentPage = 0
+    
     var body: some View {
-        TabView {
-            detailsView()
-            emissionsView()
-        }
-        .tabViewStyle(.page)
-        .tabViewStyle(.page(indexDisplayMode: .always))
-        .navigationTitle(model.makeAndModel.isEmpty ? "Vehicle Detail" : model.makeAndModel)
-        .onAppear() {
-            UIPageControl.appearance().currentPageIndicatorTintColor = .black
-            UIPageControl.appearance().pageIndicatorTintColor = .gray
+        VStack {
+            TabView(selection: $currentPage) {
+                detailsView()
+                    .tag(0)
+                emissionsView()
+                    .tag(1)
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+            .navigationTitle(model.makeAndModel.isEmpty ? "Vehicle Detail" : model.makeAndModel)
+
+            HStack {
+                ForEach(0..<2) { index in
+                    Circle()
+                        .fill(index == currentPage ? Color.blue : Color.gray)
+                        .frame(width: 10, height: 10)
+                }
+            }
+            .padding(.top, 10)
+            
+            Spacer()
         }
     }
     
