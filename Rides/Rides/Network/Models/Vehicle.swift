@@ -27,6 +27,7 @@ struct Vehicle: Codable, Identifiable {
     
     enum SortKeys: String, CaseIterable {
         case vin = "VIN"
+        case carType = "Car Type"
         case mileage = "Mileage"
         case kilometrage = "Kilometrage"
         case licensePlate = "License Plate"
@@ -80,6 +81,8 @@ extension Array where Element == Vehicle {
             return self.sorted { $0.mileage < $1.mileage }
         case .vin:
             return self.sorted { $0.vin < $1.vin }
+        case .carType:
+            return self.sorted { $0.carType < $1.carType }
         }
     }
 }
