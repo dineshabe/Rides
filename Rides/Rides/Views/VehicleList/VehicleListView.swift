@@ -8,15 +8,18 @@
 import SwiftUI
 
 struct VehicleListView: View {
-    @StateObject private var viewModel: VehicleListViewModel = VehicleListViewModel(client: RidesClient())
+    @StateObject var viewModel: VehicleListViewModel
 
     var body: some View {
         NavigationSplitView {
             VStack(alignment: .leading, spacing: 0) {
-                headerView()
                 
-                List(viewModel.vehicles, selection: $viewModel.selectedVehicleId) { vehicle in
-                    VehicleCell(model: vehicle)
+                List(selection: $viewModel.selectedVehicleId) {
+                    Section(header: headerView()) {
+                        ForEach(viewModel.vehicles) { vehicle in
+                            VehicleCell(model: vehicle)
+                        }
+                    }
                 }
                 .overlay(Group {
                     if viewModel.vehicles.isEmpty {
@@ -53,7 +56,7 @@ struct VehicleListView: View {
     
     @ViewBuilder
     func headerView() -> some View {
-        GroupBox {
+        VStack {
             HStack {
                 TextField("Enter the count of vehicles to fetch", text: $viewModel.fetchCount)
                     .textFieldStyle(.roundedBorder)
@@ -64,6 +67,7 @@ struct VehicleListView: View {
                 .buttonStyle(.bordered)
             }
         }
+        .textCase(.none)
     }
     
     @ViewBuilder
@@ -76,6 +80,6 @@ struct VehicleListView: View {
     }
 }
 
-#Preview {
+/*#Preview {
     VehicleListView()
-}
+}*/
